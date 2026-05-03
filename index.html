@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Text Formatter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="app">
+    <section class="card">
+      <header class="card-header">
+        <h1>Text Formatting Tool</h1>
+        <p>Paste your text, click format, and preview the result.</p>
+      </header>
+
+      <div class="form-group">
+        <label for="inputText">Input Text</label>
+        <textarea
+          id="inputText"
+          name="inputText"
+          placeholder="Type or paste your text here..."
+        ></textarea>
+      </div>
+
+      <button id="formatBtn" type="button">Format Text</button>
+
+      <div class="output-section">
+        <h2>Formatted Output</h2>
+        <div id="result" aria-live="polite">
+          Your formatted text will appear here.
+        </div>
+      </div>
+    </section>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
