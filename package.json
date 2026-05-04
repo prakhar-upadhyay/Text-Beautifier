@@ -1,0 +1,16 @@
+{
+  "name": "text-beautifier",
+  "private": true,
+  "description": "Text formatter UI with server-side Gemini proxy",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1"
+  }
+}

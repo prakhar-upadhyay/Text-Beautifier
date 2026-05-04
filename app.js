@@ -2,77 +2,26 @@ const inputEl = document.getElementById("inputText");
 const outputEl = document.getElementById("result");
 const formatBtn = document.getElementById("formatBtn");
 
-const GEMINI_API_KEY = "AIzaSyDhFA37vwfIyM0ZokjliUw8UaDl8CdJCRw";
-const GEMINI_MODELS = ["gemini-2.0-flash"];
+async function transformTextViaServer(inputText) {
+  const response = await fetch("/api/format", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text: inputText }),
+  });
 
-async function transformTextWithGemini(inputText) {
-  const payload = {
-    contents: [
-      {
-        parts: [
-          {
-            text: `Format and improve readability of this text while preserving meaning:\n\n${inputText}`,
-          },
-        ],
-      },
-    ],
-    generationConfig: {
-      temperature: 0.2,
-    },
-  };
+  const payload = await response.json().catch(() => ({}));
 
-  let lastStatus = 0;
-  let lastBody = "";
-  let data = null;
-
-  for (const model of GEMINI_MODELS) {
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
-
-    const response = await fetch(geminiUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
-
-    const responseBodyText = await response.text();
-
-    if (response.ok) {
-      data = JSON.parse(responseBodyText);
-      break;
-    }
-
-    let parsedError = null;
-    try {
-      parsedError = JSON.parse(responseBodyText);
-    } catch (_) {
-      parsedError = null;
-    }
-
-    if (response.status === 429) {
-      throw new Error(
-        "Gemini quota exceeded (429). Add billing or wait for quota reset, then try again."
-      );
-    }
-
-    lastStatus = response.status;
-    lastBody = responseBodyText;
+  if (!response.ok) {
+    const msg = payload?.error || `Request failed (${response.status}).`;
+    throw new Error(msg);
   }
 
-  if (!data) {
-    throw new Error(
-      `Gemini request failed with status ${lastStatus}. ${lastBody.slice(0, 120)}`
-    );
+  const formatted = payload?.formatted;
+  if (typeof formatted !== "string" || !formatted.trim()) {
+    throw new Error("Server returned an empty result.");
   }
 
-  const transformedText = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-
-  if (!transformedText) {
-    throw new Error("Gemini returned an empty response.");
-  }
-
-  return transformedText;
+  return formatted.trim();
 }
 
 formatBtn.addEventListener("click", async () => {
@@ -87,7 +36,7 @@ formatBtn.addEventListener("click", async () => {
   formatBtn.disabled = true;
 
   try {
-    const transformed = await transformTextWithGemini(inputText);
+    const transformed = await transformTextViaServer(inputText);
     outputEl.textContent = transformed;
   } catch (error) {
     outputEl.textContent = `Error: ${error.message}`;
